@@ -97,6 +97,7 @@ Component blank_edit is
 	port(
       blank_in       :  IN    STD_LOGIC_VECTOR(5 DOWNTO 0);
 		s              :  IN  std_logic_vector(1 downto 0);
+		reset_n	      :  IN std_logic;
       value_in       :  IN     STD_LOGIC_VECTOR(15 DOWNTO 0);                
       blank_out      :  OUT   STD_LOGIC_VECTOR(5 DOWNTO 0)       
          );   
@@ -178,6 +179,9 @@ Seven_seg_ins: SevenSegment
 		);
 		
 debounce_ins: debounce
+	generic map (clk_freq   => 50_000_000,
+	            stable_time   => 30
+					 )
 	PORT MAP(
 		clk     => clk,
 		reset_n => reset_n,
@@ -197,7 +201,8 @@ DFF_EN_ins: DFF_EN
 blank_edit_ins:blank_edit
 	PORT MAP(
 		Blank_in   => Blank,
-		s          => s, 	
+		s          => s,
+		reset_n    => reset_n,
 		value_in   => DFF_out,
 		blank_out  => blank_out 
 		);

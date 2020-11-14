@@ -32,24 +32,16 @@ type Register_Array is array (natural range <>) of REG;
 signal REG_ARRAY : Register_Array(2**N downto 1);
 
 type temporary is array(integer range <>) of integer;
+
 signal tmp : temporary((2**N)-1 downto 1);
+
+signal temp2 : temporary((2**N)-1 downto 1);
+signal temp3 : temporary((2**N)-1 downto 1);
+
 
 signal tmplast : std_logic_vector(2**N-1 downto 0);
 constant Zeros : STD_LOGIC_VECTOR(11 downto 0) := (others => '0');
 
---signal out1 :integer;
---signal out2 :integer;
-
---signal in1 :integer;
---signal in2 :integer;
-
---component INT_REG is
-	--port(
-			--D			    : in integer;
-			--RST, EN, clk : in std_logic;
-			--Q			    : out integer
-		--);
---end component;
 
 
 begin
@@ -78,44 +70,39 @@ begin
       end if;
    end process shift_reg;
    
-   LoopB1: for i in 1 to (2**N)/2 generate
-		
-		--tmp(i)<= to_integer(unsigned(REG_ARRAY((2*i)-1)))  + to_integer(unsigned(REG_ARRAY(2*i)));
-		
-		--int_register_ins1: INT_REG
-		--	PORT MAP(
-			--D   => tmp(i), 
-			--RST => reset_n,
-			--EN  => '0', 
-			--clk => clk,
-			--Q   => out1
-			--);	
-			
-      
-		--tmp(i) <= out1;
-		
-		tmp(i) <=to_integer(unsigned(REG_ARRAY((2*i)-1)))  + to_integer(unsigned(REG_ARRAY(2*i)));
+	shift_reg2 : process(clk, reset_n)
+	begin
 	
-   end generate LoopB1;
+   LoopB1: for i in 1 to (2**N)/2 loop
+		
+		if (reset_n = '0') then
+			temp2(i) <= 0;
+		
+		elsif rising_edge(clk) then
+			temp2(i) <=to_integer(unsigned(REG_ARRAY((2*i)-1)))  + to_integer(unsigned(REG_ARRAY(2*i)));
+		
+		end if;
+		tmp(i) <=temp2(i);
+	
+   end loop LoopB1;
+	end process;
    
-   LoopB2: for i in ((2**N)/2)+1 to (2**N)-1 generate
+	shift_reg3 : process(clk, reset_n)
+	begin
+   LoopB2: for i in ((2**N)/2)+1 to (2**N)-1 loop
 		
-	--	tmp(i)<= tmp(2*(i-(2**N)/2)-1) + tmp(2*(i-(2**N)/2));
+		if (reset_n = '0') then
+			temp3(i) <= 0;
 		
-	--	int_register_ins2: INT_REG
-	--		PORT MAP(
-	--		D   => tmp(i), 
-	--		RST => reset_n,
-	--		EN  => '0', 
-	--		clk => clk,
-	--		Q   => out2
-	--		);		
---		tmp(i) <=out2;
-      
-		tmp(i) <= tmp(2*(i-(2**N)/2)-1) + tmp(2*(i-(2**N)/2));
+		elsif rising_edge(clk) then
+			temp3(i) <= tmp(2*(i-(2**N)/2)-1) + tmp(2*(i-(2**N)/2));
+		
+		end if;
+		tmp(i) <= temp3(i);
+		--tmp(i) <= tmp(2*(i-(2**N)/2)-1) + tmp(2*(i-(2**N)/2));
 
-   end generate LoopB2;
-   
+   end loop LoopB2;
+   end process;
    tmplast <= std_logic_vector(to_unsigned(tmp((2**N)-1), tmplast'length));
       
 end rtl;
