@@ -106,7 +106,7 @@ End Component;
 Component debounce is
 	Generic(
 		clk_freq    : INTEGER := 50_000_000;
-		stable_time : INTEGER := 30					 -- set to 30ms for the required stable threshold time
+		stable_time : INTEGER := 10					 -- set to 30ms for the required stable threshold time
 		   );        
 	Port(
 		clk     : IN  STD_LOGIC; 
