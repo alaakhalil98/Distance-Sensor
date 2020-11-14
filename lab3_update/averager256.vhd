@@ -70,7 +70,7 @@ begin
       end if;
    end process shift_reg;
    
-	shift_reg2 : process(clk, reset_n)
+	add_reg2 : process(clk, reset_n)
 	begin
 	
    LoopB1: for i in 1 to (2**N)/2 loop
@@ -85,10 +85,8 @@ begin
 		tmp(i) <=temp2(i);
 	
    end loop LoopB1;
-	end process;
-   
-	shift_reg3 : process(clk, reset_n)
-	begin
+	
+	
    LoopB2: for i in ((2**N)/2)+1 to (2**N)-1 loop
 		
 		if (reset_n = '0') then
