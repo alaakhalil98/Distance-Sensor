@@ -18,11 +18,12 @@ architecture Behavioral of top_level is
 Signal Num_Hex0, Num_Hex1, Num_Hex2, Num_Hex3, Num_Hex4, Num_Hex5 : STD_LOGIC_VECTOR (3 downto 0):= (others=>'0');   
 Signal Blank,Blank_out:  STD_LOGIC_VECTOR (5 downto 0);
 
-Signal DP_in0, DP_in1, DP_in2, DP_in3:  STD_LOGIC_VECTOR (5 downto 0);
+Signal DP_in0, DP_in1, DP_in2, DP_in3:  STD_LOGIC_VECTOR (15 downto 0);
 Signal DP_in: STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 Signal switch_inputs: STD_LOGIC_VECTOR (12 downto 0);
 
+signal ADC_out_filled: STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 
 signal s:             STD_LOGIC_VECTOR(1 downto 0);
@@ -135,10 +136,12 @@ begin
  
    Blank     <= "110000"; -- blank the 2 MSB 7-segment displays (1=7-seg display off, 0=7-seg display on)
 	
-	DP_in0    <= "000000";
-	DP_in1    <= "000100";
-	DP_in2    <= "001000";
-	DP_in3    <= "000000";
+	DP_in0    <= "0000"&"0000"&"0000"&"0000";
+	DP_in1    <= "0000"&"0000"&"0000"&"0100";
+	DP_in2    <= "0000"&"0000"&"0000"&"1000";
+	DP_in3    <= "0000"&"0000"&"0000"&"0000";
+	
+	ADC_out_filled <= "0000" & ADC_out;
 	
 Synchronizer_ins: Synchronizer
 	port map(
@@ -193,7 +196,7 @@ DFF_EN_ins: DFF_EN
 	PORT MAP(
 		D   => mux_out, -- when enabled, DFF will output the currently displayed value
 		RST => reset_n,
-		EN  => not EN, --when the button is pressed, we freeze the displayed value
+		EN  => EN,       --when the button is pressed, we freeze the displayed value
 		clk => clk,
 		Q   => DFF_out
 		);
@@ -214,17 +217,17 @@ MUX4TO1_ins: MUX4TO1
 		in1      => in1,
 		in2 	   => distance_dec,
 		in3      => voltage_dec,
-		in4	   => "0000" & ADC_out
+		in4	   => ADC_out_filled
       );	
                 
 MUX4TO1_ins2: MUX4TO1
 	PORT MAP(
 		s        => s,                          
 		mux_out  => DP_in,   
-		in1      => "0000"&"0000"&"00"& DP_in0,
-		in2 	   => "0000"&"0000"&"00"& DP_in1,
-		in3      => "0000"&"0000"&"00"& DP_in2,
-		in4	   => "0000"&"0000"&"00"& DP_in3
+		in1      => DP_in0,
+		in2 	   => DP_in1,
+		in3      => DP_in2,
+		in4	   => DP_in3
       );	 
 
 LEDR(9 downto 0) <=SW_int(9 downto 0); -- gives visual display of the switch inputs to the LEDs on board

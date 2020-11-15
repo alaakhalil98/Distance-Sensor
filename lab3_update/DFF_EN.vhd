@@ -13,7 +13,7 @@ architecture BEHAVIOUR of DFF_EN is
 begin
 	process (clk, RST)
 	begin
-		if (RST = '0') then
+		if (RST = '1') then
 			Q <= "0000"&"0000"&"0000"&"0000";
 		elsif rising_edge(clk) then
 			if (EN = '0') then
